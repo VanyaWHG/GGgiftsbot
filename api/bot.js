@@ -38,23 +38,26 @@ export default async function handler(req, res) {
       const chatId = update.callback_query.message.chat.id;
       const data = update.callback_query.data;
 
-      if (data === "luck") {
-        await bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
-      } else if (data === "tg") {
-        await bot.sendMessage(chatId, "🔥 Присоединяйся к нашим раздачам!");
-      } else if (data === "about") {
-        await bot.sendMessage(chatId, "Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.
+   if (data === "luck") {
+  await bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
+} else if (data === "tg") {
+  await bot.sendMessage(chatId, "🔥 Присоединяйся к нашим раздачам!");
+} else if (data === "about") {
+  await bot.sendMessage(chatId, `
+Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.
 
 • Честная механика выпадения призов
 • Моментальное получение предметов в Telegram
 
 📢 Наш канал в Telegram — @GGgifts_official
 📩 Поддержка — @GGgifts_help
-🤝 Сотрудничество — @GGgifts_help");
-      }
+🤝 Сотрудничество — @GGgifts_help
+  `, { parse_mode: "Markdown" });
+}
 
-      // Подтверждаем Telegram, что callback обработан
-      await bot.answerCallbackQuery(update.callback_query.id);
+// Подтверждаем Telegram, что callback обработан
+await bot.answerCallbackQuery(update.callback_query.id);
+
     }
 
     res.status(200).send("OK");
