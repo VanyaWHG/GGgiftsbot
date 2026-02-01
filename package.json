@@ -1,6 +1,8 @@
 {
+  "name": "gggifts-bot",
+  "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "telegraf": "^4.16.0"
+    "node-telegram-bot-api": "^0.61.0"
   }
 }
