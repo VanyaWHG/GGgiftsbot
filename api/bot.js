@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     const update = req.body;
 
-    // Обработка команды /start
+    // Команда /start
     if (update.message && update.message.text === "/start") {
       const chatId = update.message.chat.id;
 
@@ -33,17 +33,21 @@ export default async function handler(req, res) {
       });
     }
 
-    // Обработка нажатий кнопок (callback_data)
+    // Обработка нажатий кнопок
     if (update.callback_query) {
       const chatId = update.callback_query.message.chat.id;
       const data = update.callback_query.data;
 
-   if (data === "luck") {
-  await bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
-} else if (data === "tg") {
-  await bot.sendMessage(chatId, "🔥 Присоединяйся к нашим раздачам!");
-} else if (data === "about") {
-  await bot.sendMessage(chatId, `
+      // Сначала подтверждаем Telegram, чтобы кнопка перестала крутиться
+      await bot.answerCallbackQuery(update.callback_query.id);
+
+      // Отправляем сообщение асинхронно, не блокируя сервер
+      if (data === "luck") {
+        bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
+      } else if (data === "tg") {
+        bot.sendMessage(chatId, "🔥 Присоединяйся к нашим раздачам!");
+      } else if (data === "about") {
+        bot.sendMessage(chatId, `
 Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.
 
 • Честная механика выпадения призов
@@ -52,12 +56,8 @@ export default async function handler(req, res) {
 📢 Наш канал в Telegram — @GGgifts_official
 📩 Поддержка — @GGgifts_help
 🤝 Сотрудничество — @GGgifts_help
-  `, { parse_mode: "Markdown" });
-}
-
-// Подтверждаем Telegram, что callback обработан
-await bot.answerCallbackQuery(update.callback_query.id);
-
+        `, { parse_mode: "Markdown" });
+      }
     }
 
     res.status(200).send("OK");
