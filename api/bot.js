@@ -1,108 +1,96 @@
-import TelegramBot from "node-telegram-bot-api";
-import fs from "fs";
-import path from "path";
+const TelegramBot = require("node-telegram-bot-api");
+const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 
-const token = process.env.BOT_TOKEN;
-const bot = new TelegramBot(token);
-
-// Путь к картинке
+const bot = new TelegramBot(process.env.BOT_TOKEN);
 const imagePath = path.join(process.cwd(), "gggifts.jpg");
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
+module.exports = async (req, res) => {
+  try {
     const update = req.body;
 
-    // Команда /start
-    // Команда /start
-if (update.message && update.message.text === "/start") {
-  const chatId = update.message.chat.id;
+    // /start
+    if (update.message && update.message.text === "/start") {
+      const chatId = update.message.chat.id;
 
-  // 1️⃣ Сообщение с картинкой и INLINE-кнопками
-  await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
-    caption:
-      "🎁 *Открывай бесплатные и авторские кейсы с NFT-подарками!*\n" +
-      "🚀 *Апгрейди свои подарки до более ценных.*\n\n" +
-      "✅ *Испытай удачу с нами!*",
-    parse_mode: "Markdown",
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: "🚀 Испытать удачу 🚀",
-            web_app: { url: "https://gggiftsbot.vercel.app" }
-          }
-        ],
-        [
-          {
-            text: "🔥 Телеграмм с раздачами 🔥",
-            url: "https://t.me/GGgifts_official"
-          }
-        ],
-        [
-          { text: "ℹ️ О нас", callback_data: "about" }
-        ],
-        [
-          {
-            text: "🤝 Сотрудничество / Поддержка",
-            url: "https://t.me/GGgifts_help"
-          }
-        ]
-      ]
-    }
-  });
-
-  // 2️⃣ Постоянная кнопка внизу чата (рядом с 📎)
-  await bot.sendMessage(chatId, "👇 Открывай мини-приложение в любой момент", {
-    reply_markup: {
-      keyboard: [
-        [
-          {
-            text: "🚀 Открыть мини-приложение",
+      // 🔵 СИНЯЯ КНОПКА "Open App"
+      await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/setChatMenuButton`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          menu_button: {
+            type: "web_app",
+            text: "Open App",
             web_app: {
               url: "https://gggiftsbot.vercel.app"
             }
           }
-        ]
-      ],
-      resize_keyboard: true,
-      persistent: true
+        })
+      });
+
+      // Сообщение старта (ВСЁ КАК БЫЛО, кнопки inline)
+      await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
+        caption:
+          "🎁 *Открывай бесплатные и авторские кейсы с Telegram-подарками!*\n" +
+          "🚀 *Апгрейди свои подарки до более ценных.*\n\n" +
+          "✅ *Испытай удачу с нами!*",
+        parse_mode: "Markdown",
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "🚀 Испытать удачу 🚀",
+                web_app: { url: "https://gggiftsbot.vercel.app" }
+              }
+            ],
+            [
+              {
+                text: "🔥 Телеграмм с раздачами 🔥",
+                url: "https://t.me/GGgifts_official"
+              }
+            ],
+            [
+              {
+                text: "ℹ️ О нас",
+                callback_data: "about"
+              }
+            ],
+            [
+              {
+                text: "🤝 Сотрудничество / Поддержка",
+                url: "https://t.me/GGgifts_help"
+              }
+            ]
+          ]
+        }
+      });
     }
-  });
-}
 
-
-    // Обработка нажатий кнопок
+    // Callback-кнопки
     if (update.callback_query) {
       const chatId = update.callback_query.message.chat.id;
       const data = update.callback_query.data;
 
-      // Сначала подтверждаем Telegram, чтобы кнопка перестала крутиться
+      if (data === "about") {
+        await bot.sendMessage(
+          chatId,
+          "Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.\n\n" +
+          "• Честная механика выпадения призов\n" +
+          "• Моментальное получение предметов в Telegram\n\n" +
+          "📢 Наш канал — @GGgifts_official\n" +
+          "📩 Поддержка — @GGgifts_help\n" +
+          "🤝 Сотрудничество — @GGgifts_help"
+        );
+      }
+
       await bot.answerCallbackQuery(update.callback_query.id);
-
-      // Отправляем сообщение асинхронно, не блокируя сервер
-      if (data === "luck") {
-        bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
-      } else if (data === "about") {
-  // Сразу подтверждаем callback
-  await bot.answerCallbackQuery(update.callback_query.id);
-
-  // Отправляем сообщение асинхронно
-  bot.sendMessage(chatId, `
-<b>Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.</b>
-
-• Честная механика выпадения призов
-• Моментальное получение предметов в Telegram
-
-📢 Наш канал в Telegram — <a href="https://t.me/GGgifts_official">@GGgifts_official</a>
-📩 Поддержка — <a href="https://t.me/GGgifts_help">@GGgifts_help</a>
-🤝 Сотрудничество — <a href="https://t.me/GGgifts_help">@GGgifts_help</a>
-  `, { parse_mode: "HTML", disable_web_page_preview: true });
-}
-
     }
 
     res.status(200).send("OK");
-  } else {
-    res.status(200).send("Bot is running");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error");
   }
-}
+};
