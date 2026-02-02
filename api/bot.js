@@ -24,11 +24,12 @@ export default async function handler(req, res) {
         parse_mode: "Markdown",
         reply_markup: {
           inline_keyboard: [
-            [{ text: "🚀 Испытать удачу 🚀", callback_data: "luck" }],
-            [{ text: "🔥 Телеграмм с раздачами 🔥", callback_data: "tg" }],
-            [{ text: "ℹ️ О нас", callback_data: "about" }],
-            [{ text: "🤝 Сотрудничество / Поддержка", url: "https://t.me/GGgifts_help" }]
-          ]
+  [{ text: "🚀 Испытать удачу 🚀", callback_data: "luck" }],
+  [{ text: "🔥 Телеграмм с раздачами 🔥", url: "https://t.me/GGgifts_official" }],
+  [{ text: "ℹ️ О нас", callback_data: "about" }],
+  [{ text: "🤝 Сотрудничество / Поддержка", url: "https://t.me/GGgifts_help" }]
+]
+
         }
       });
     }
@@ -44,8 +45,6 @@ export default async function handler(req, res) {
       // Отправляем сообщение асинхронно, не блокируя сервер
       if (data === "luck") {
         bot.sendMessage(chatId, "🎲 Твоя удача будет реализована здесь!");
-      } else if (data === "tg") {
-        bot.sendMessage(chatId, "🔥 Присоединяйся к нашим раздачам!");
       } else if (data === "about") {
   // Сразу подтверждаем callback
   await bot.answerCallbackQuery(update.callback_query.id);
