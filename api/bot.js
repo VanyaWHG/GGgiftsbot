@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const update = req.body;
 
     // /start
-    if (update.message?.text === "/start") {
+    if (update.message?.text?.startsWith("/start")) {
       const chatId = update.message.chat.id;
 
       await fetch(`${API}/sendPhoto`, {
