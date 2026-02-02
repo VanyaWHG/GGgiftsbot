@@ -14,15 +14,15 @@ module.exports = async (req, res) => {
       const chatId = update.message.chat.id;
 
       // 🔵 СИНЯЯ КНОПКА Open App (ПРАВИЛЬНО)
-      await bot.setChatMenuButton({
-        menu_button: {
-          type: "web_app",
-          text: "Open App",
-          web_app: {
-            url: "https://gggiftsbot.vercel.app"
-          }
-        }
-      });
+      await bot._request("setChatMenuButton", {
+  menu_button: {
+    type: "web_app",
+    text: "Open App",
+    web_app: {
+      url: "https://gggiftsbot.vercel.app"
+    }
+  }
+});
 
       // Стартовое сообщение (ВСЁ КАК БЫЛО)
       await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
