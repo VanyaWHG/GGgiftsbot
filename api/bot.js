@@ -1,5 +1,4 @@
 const TelegramBot = require("node-telegram-bot-api");
-const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
 
@@ -14,7 +13,7 @@ module.exports = async (req, res) => {
     if (update.message && update.message.text === "/start") {
       const chatId = update.message.chat.id;
 
-      // 🔵 СИНЯЯ КНОПКА "Open App"
+      // 🔵 СИНЯЯ КНОПКА Open App (Chat Menu Button)
       await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/setChatMenuButton`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,7 +29,7 @@ module.exports = async (req, res) => {
         })
       });
 
-      // Сообщение старта (ВСЁ КАК БЫЛО, кнопки inline)
+      // Стартовое сообщение (КАК БЫЛО)
       await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
         caption:
           "🎁 *Открывай бесплатные и авторские кейсы с Telegram-подарками!*\n" +
@@ -68,12 +67,11 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Callback-кнопки
+    // Callback
     if (update.callback_query) {
       const chatId = update.callback_query.message.chat.id;
-      const data = update.callback_query.data;
 
-      if (data === "about") {
+      if (update.callback_query.data === "about") {
         await bot.sendMessage(
           chatId,
           "Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками.\n\n" +
@@ -90,7 +88,7 @@ module.exports = async (req, res) => {
 
     res.status(200).send("OK");
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Error");
+    console.error("BOT ERROR:", err);
+    res.status(500).send("ERROR");
   }
 };
