@@ -3,16 +3,6 @@ if (update.message && update.message.text === "/start") {
   const chatId = update.message.chat.id;
 
   // 🔵 СИНЯЯ КНОПКА Open App — РАБОЧАЯ
-  await bot._request("setChatMenuButton", {
-    menu_button: {
-      type: "web_app",
-      text: "Open App",
-      web_app: {
-        url: "https://gggiftsbot.vercel.app"
-      }
-    }
-  });
-
   await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
     caption:
       "🎁 *Открывай бесплатные и авторские кейсы с Telegram-подарками!*\n" +
