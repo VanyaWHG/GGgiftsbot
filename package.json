@@ -1,8 +1,10 @@
 {
-  "name": "gggifts-bot",
+  "name": "gggiftsbot",
   "version": "1.0.0",
-  "type": "module",
+  "main": "api/bot.js",
+  "type": "commonjs",
   "dependencies": {
-    "node-telegram-bot-api": "^0.61.0"
+    "node-telegram-bot-api": "^0.61.0",
+    "node-fetch": "^2.6.7"
   }
 }
