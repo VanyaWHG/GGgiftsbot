@@ -24,7 +24,10 @@ export default async function handler(req, res) {
         parse_mode: "Markdown",
         reply_markup: {
           inline_keyboard: [
-  [{ text: "🚀 Испытать удачу 🚀", callback_data: "luck" }],
+  [{ 
+  text: "🚀 Испытать удачу 🚀",
+  web_app: { url: "https://gggiftsbot.vercel.app" }
+}],
   [{ text: "🔥 Телеграмм с раздачами 🔥", url: "https://t.me/GGgifts_official" }],
   [{ text: "ℹ️ О нас", callback_data: "about" }],
   [{ text: "🤝 Сотрудничество / Поддержка", url: "https://t.me/GGgifts_help" }]
