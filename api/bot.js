@@ -10,6 +10,9 @@ const TOKEN = process.env.BOT_TOKEN;
 const API = `https://api.telegram.org/bot${TOKEN}`;
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(200).send("OK");
+  }
   try {
     const update = req.body;
 
