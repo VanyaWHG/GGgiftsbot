@@ -13,38 +13,63 @@ export default async function handler(req, res) {
     const update = req.body;
 
     // Команда /start
-    if (update.message && update.message.text === "/start") {
-      const chatId = update.message.chat.id;
+    // Команда /start
+if (update.message && update.message.text === "/start") {
+  const chatId = update.message.chat.id;
 
-      await bot.sendMessage(chatId, "👇 Открывай мини-приложение в любой момент", {
-  reply_markup: {
-    keyboard: [
-      [
-        {
-          text: "🚀 Открыть мини-приложение",
-          web_app: {
-            url: "https://gggiftsbot.vercel.app"
+  // 1️⃣ Сообщение с картинкой и INLINE-кнопками
+  await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
+    caption:
+      "🎁 *Открывай бесплатные и авторские кейсы с NFT-подарками!*\n" +
+      "🚀 *Апгрейди свои подарки до более ценных.*\n\n" +
+      "✅ *Испытай удачу с нами!*",
+    parse_mode: "Markdown",
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "🚀 Испытать удачу 🚀",
+            web_app: { url: "https://gggiftsbot.vercel.app" }
           }
-        }
+        ],
+        [
+          {
+            text: "🔥 Телеграмм с раздачами 🔥",
+            url: "https://t.me/GGgifts_official"
+          }
+        ],
+        [
+          { text: "ℹ️ О нас", callback_data: "about" }
+        ],
+        [
+          {
+            text: "🤝 Сотрудничество / Поддержка",
+            url: "https://t.me/GGgifts_help"
+          }
+        ]
       ]
-    ],
-    resize_keyboard: true,
-    persistent: true
-  }
-});
-
-  [{ 
-  text: "🚀 Испытать удачу 🚀",
-  web_app: { url: "https://gggiftsbot.vercel.app" }
-}],
-  [{ text: "🔥 Телеграмм с раздачами 🔥", url: "https://t.me/GGgifts_official" }],
-  [{ text: "ℹ️ О нас", callback_data: "about" }],
-  [{ text: "🤝 Сотрудничество / Поддержка", url: "https://t.me/GGgifts_help" }]
-]
-
-        }
-      });
     }
+  });
+
+  // 2️⃣ Постоянная кнопка внизу чата (рядом с 📎)
+  await bot.sendMessage(chatId, "👇 Открывай мини-приложение в любой момент", {
+    reply_markup: {
+      keyboard: [
+        [
+          {
+            text: "🚀 Открыть мини-приложение",
+            web_app: {
+              url: "https://gggiftsbot.vercel.app"
+            }
+          }
+        ]
+      ],
+      resize_keyboard: true,
+      persistent: true
+    }
+  });
+}
+
 
     // Обработка нажатий кнопок
     if (update.callback_query) {
