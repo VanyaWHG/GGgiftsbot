@@ -13,23 +13,18 @@ module.exports = async (req, res) => {
     if (update.message && update.message.text === "/start") {
       const chatId = update.message.chat.id;
 
-      // 🔵 СИНЯЯ КНОПКА Open App (Chat Menu Button)
-      await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/setChatMenuButton`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          menu_button: {
-            type: "web_app",
-            text: "Open App",
-            web_app: {
-              url: "https://gggiftsbot.vercel.app"
-            }
+      // 🔵 СИНЯЯ КНОПКА Open App (ПРАВИЛЬНО)
+      await bot.setChatMenuButton({
+        menu_button: {
+          type: "web_app",
+          text: "Open App",
+          web_app: {
+            url: "https://gggiftsbot.vercel.app"
           }
-        })
+        }
       });
 
-      // Стартовое сообщение (КАК БЫЛО)
+      // Стартовое сообщение (ВСЁ КАК БЫЛО)
       await bot.sendPhoto(chatId, fs.createReadStream(imagePath), {
         caption:
           "🎁 *Открывай бесплатные и авторские кейсы с Telegram-подарками!*\n" +
@@ -67,7 +62,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Callback
+    // Callback "О нас"
     if (update.callback_query) {
       const chatId = update.callback_query.message.chat.id;
 
