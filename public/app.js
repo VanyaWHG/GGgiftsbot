@@ -30,3 +30,7 @@ function showPage(name) {
 
 // по умолчанию
 showPage("cases");
+if (user.username !== "GGgiftsHelp") {
+  document.getElementById("page-admin").style.display = "none";
+}
+
