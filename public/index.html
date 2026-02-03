@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>GGgifts — Испытать удачу</title>
+  <title>GGgifts</title>
 
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -13,43 +13,102 @@
       font-family: Arial, sans-serif;
       background: #0f0f0f;
       color: white;
+    }
+
+    /* TOP BAR */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 56px;
+      background: #121212;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #222;
+      z-index: 10;
+    }
+
+    #logo {
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #balance {
+      font-size: 14px;
+      background: #1c1c1c;
+      padding: 6px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    /* CONTENT */
+    #content {
+      padding-top: 70px;
+      padding-bottom: 80px;
       text-align: center;
     }
 
-    h1 {
-      margin-top: 30px;
-      font-size: 24px;
+    .page {
+      display: none;
+      padding: 20px;
     }
 
-    .btn {
-      margin-top: 30px;
-      padding: 15px;
-      font-size: 18px;
-      background: #2ea6ff;
-      border: none;
-      border-radius: 10px;
-      color: white;
+    .page.active {
+      display: block;
+    }
+
+    /* NAV BAR */
+    #nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
       width: 100%;
-      cursor: pointer;
+      height: 64px;
+      display: flex;
+      background: #121212;
+      border-top: 1px solid #222;
+    }
+
+    #nav button {
+      flex: 1;
+      background: #1c1c1c;
+      color: #aaa;
+      border: none;
+      font-size: 12px;
+    }
+
+    #nav button.main {
+      flex: 1.4;
+      background: #2ea6ff;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
+<!-- TOP -->
 <div id="topbar">
-  <span id="logo" onclick="showPage('cases')">GGgifts</span>
-  <span id="balance">⭐ 0 +</span>
+  <div id="logo" onclick="showPage('cases')">GGgifts</div>
+  <div id="balance" onclick="addBalance()">⭐ 0 +</div>
 </div>
 
+<!-- CONTENT -->
 <div id="content">
-  <div id="page-cases">🎁 Кейсы</div>
-  <div id="page-upgrade" style="display:none">🚀 Апгрейд</div>
-  <div id="page-craft" style="display:none">🛠 Крафты</div>
-  <div id="page-profile" style="display:none">👤 Профиль</div>
-  <div id="page-settings" style="display:none">⚙️ Настройки</div>
-  <div id="page-admin" style="display:none">🛡 Админка</div>
+  <div id="cases" class="page active">🎁 <h2>Кейсы</h2></div>
+  <div id="upgrade" class="page">🚀 <h2>Апгрейд</h2></div>
+  <div id="craft" class="page">🛠 <h2>Крафты</h2></div>
+  <div id="profile" class="page">👤 <h2>Профиль</h2></div>
+  <div id="settings" class="page">⚙️ <h2>Настройки</h2></div>
+  <div id="admin" class="page">🛡 <h2>Админка</h2></div>
 </div>
 
+<!-- NAV -->
 <div id="nav">
   <button onclick="showPage('upgrade')">Апгрейд</button>
   <button class="main" onclick="showPage('cases')">Кейсы</button>
@@ -58,7 +117,31 @@
   <button onclick="showPage('settings')">Настройки</button>
 </div>
 
-<script src="app.js"></script>
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  const pages = document.querySelectorAll('.page');
+
+  function showPage(id) {
+    pages.forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function addBalance() {
+    alert("Пополнение скоро будет ⭐");
+  }
+
+  // админка только для тебя
+  const ADMIN_USERNAME = "GGgiftsHelp";
+  if (tg.initDataUnsafe?.user?.username === ADMIN_USERNAME) {
+    const adminPage = document.getElementById('admin');
+    const adminBtn = document.createElement('button');
+    adminBtn.textContent = "Админка";
+    adminBtn.onclick = () => showPage('admin');
+    document.getElementById('nav').appendChild(adminBtn);
+  }
+</script>
 
 </body>
 </html>
