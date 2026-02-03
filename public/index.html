@@ -141,6 +141,20 @@
     adminBtn.onclick = () => showPage('admin');
     document.getElementById('nav').appendChild(adminBtn);
   }
+  const user = tg.initDataUnsafe?.user;
+
+  if (user) {
+    console.log("Telegram user:", user);
+
+    fetch("/api/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: user.id,
+        username: user.username
+      })
+    });
+  }
 </script>
 
 </body>
