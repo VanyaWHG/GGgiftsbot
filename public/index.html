@@ -40,23 +40,29 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>🎲 Испытай удачу</h1>
-    <p>Добро пожаловать в GGgifts Mini App</p>
+<div id="topbar">
+  <span id="logo" onclick="showPage('cases')">GGgifts</span>
+  <span id="balance">⭐ 0 +</span>
+</div>
 
-    <button class="btn" onclick="test()">
-      Открыть тестовый кейс
-    </button>
-  </div>
+<div id="content">
+  <div id="page-cases">🎁 Кейсы</div>
+  <div id="page-upgrade" style="display:none">🚀 Апгрейд</div>
+  <div id="page-craft" style="display:none">🛠 Крафты</div>
+  <div id="page-profile" style="display:none">👤 Профиль</div>
+  <div id="page-settings" style="display:none">⚙️ Настройки</div>
+  <div id="page-admin" style="display:none">🛡 Админка</div>
+</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand(); // разворачиваем мини-апп
+<div id="nav">
+  <button onclick="showPage('upgrade')">Апгрейд</button>
+  <button class="main" onclick="showPage('cases')">Кейсы</button>
+  <button onclick="showPage('craft')">Крафты</button>
+  <button onclick="showPage('profile')">Профиль</button>
+  <button onclick="showPage('settings')">Настройки</button>
+</div>
 
-    function test() {
-      alert("Тут скоро будет кейс 👀");
-    }
-  </script>
+<script src="app.js"></script>
 
 </body>
 </html>
