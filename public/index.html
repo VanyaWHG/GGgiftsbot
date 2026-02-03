@@ -128,8 +128,32 @@
     document.getElementById(id).classList.add('active');
   }
 
-  function addBalance() {
-    alert("Пополнение скоро будет ⭐");
+ async function addBalance() {
+  const user = tg.initDataUnsafe?.user;
+  if (!user) return;
+
+  const amount = prompt("Сколько ⭐ пополнить?");
+  if (!amount) return;
+
+  const res = await fetch("/api/topup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      amount
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert(`Зачислено ⭐${data.added}\nКомиссия ⭐${data.fee}`);
+    loadBalance();
+  } else {
+    alert("Ошибка пополнения");
+  }
+}
+
   }
 
   // админка только для тебя
