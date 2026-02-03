@@ -155,6 +155,19 @@
       })
     });
   }
+  async function loadBalance() {
+  const user = tg.initDataUnsafe?.user;
+  if (!user) return;
+
+  const res = await fetch(`/api/balance?id=${user.id}`);
+  const data = await res.json();
+
+  document.getElementById("balance").innerText =
+    `⭐ ${data.balance} +`;
+}
+
+loadBalance();
+
 </script>
 
 </body>
