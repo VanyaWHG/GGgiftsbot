@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>GGgifts</title>
-
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -15,195 +13,126 @@
       color: white;
     }
 
-    /* TOP BAR */
-    #topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 56px;
-      background: #121212;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      border-bottom: 1px solid #222;
-      z-index: 10;
-    }
-
-    #logo {
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #balance {
-      font-size: 14px;
-      background: #1c1c1c;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-
-    /* CONTENT */
-    #content {
-      padding-top: 70px;
-      padding-bottom: 80px;
+    header {
+      padding: 15px;
       text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: #111;
     }
 
-    .page {
-      display: none;
-      padding: 20px;
+    .container {
+      padding: 15px;
     }
 
-    .page.active {
-      display: block;
-    }
-
-    /* NAV BAR */
-    #nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
+    input, button, textarea {
       width: 100%;
-      height: 64px;
-      display: flex;
-      background: #121212;
-      border-top: 1px solid #222;
-    }
-
-    #nav button {
-      flex: 1;
-      background: #1c1c1c;
-      color: #aaa;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
       border: none;
-      font-size: 12px;
+      font-size: 16px;
     }
 
-    #nav button.main {
-      flex: 1.4;
+    button {
       background: #2ea6ff;
       color: white;
-      font-weight: bold;
-      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .admin {
+      margin-top: 20px;
+      border-top: 1px solid #333;
+      padding-top: 20px;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<!-- TOP -->
-<div id="topbar">
-  <div id="logo" onclick="showPage('cases')">GGgifts</div>
-  <div id="balance" onclick="addBalance()">⭐ 0 +</div>
-</div>
+<header onclick="goCases()">GGgifts</header>
 
-<!-- CONTENT -->
-<div id="content">
-  <div id="cases" class="page active">🎁 <h2>Кейсы</h2></div>
-  <div id="upgrade" class="page">🚀 <h2>Апгрейд</h2></div>
-  <div id="craft" class="page">🛠 <h2>Крафты</h2></div>
-  <div id="profile" class="page">👤 <h2>Профиль</h2></div>
-  <div id="settings" class="page">⚙️ <h2>Настройки</h2></div>
-  <div id="admin" class="page">🛡 <h2>Админка</h2></div>
-</div>
+<div class="container">
 
-<!-- NAV -->
-<div id="nav">
-  <button onclick="showPage('upgrade')">Апгрейд</button>
-  <button class="main" onclick="showPage('cases')">Кейсы</button>
-  <button onclick="showPage('craft')">Крафты</button>
-  <button onclick="showPage('profile')">Профиль</button>
-  <button onclick="showPage('settings')">Настройки</button>
+  <div id="main">
+    <h3>🎲 Кейсы</h3>
+    <p>Скоро тут будут кейсы</p>
+  </div>
+
+  <div id="admin" class="admin hidden">
+    <h3>👑 Админка</h3>
+
+    <input id="userId" placeholder="Telegram ID пользователя" />
+    <input id="amount" placeholder="Сумма GG⭐" type="number" />
+
+    <button onclick="addBalance()">➕ Начислить</button>
+    <button onclick="removeBalance()">➖ Забрать</button>
+
+    <textarea id="broadcastText" placeholder="Сообщение всем пользователям"></textarea>
+    <button onclick="broadcast()">📢 Рассылка</button>
+  </div>
+
 </div>
 
 <script>
   const tg = window.Telegram.WebApp;
   tg.expand();
 
-  const pages = document.querySelectorAll('.page');
+  const user = tg.initDataUnsafe.user;
+  const ADMIN_ID = user.id;
 
-  function showPage(id) {
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+  // показываем админку только тебе
+  if (user.username === "GGgiftsHelp") {
+    document.getElementById("admin").classList.remove("hidden");
   }
 
- async function addBalance() {
-  const amount = prompt("Введите сумму ⭐ (целое число)");
-  if (!amount) return;
-
-  const res = await fetch("/api/create-invoice", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount })
-  });
-
-  const data = await res.json();
-
-  if (data.invoice_link) {
-    tg.openInvoice(data.invoice_link);
-  } else {
-    alert("Ошибка создания платежа");
+  function goCases() {
+    document.getElementById("admin").classList.add("hidden");
+    document.getElementById("main").classList.remove("hidden");
   }
-}
 
-  // админка только для тебя
-  const ADMIN_USERNAME = "GGgiftsHelp";
-  if (tg.initDataUnsafe?.user?.username === ADMIN_USERNAME) {
-    const adminPage = document.getElementById('admin');
-    const adminBtn = document.createElement('button');
-    adminBtn.textContent = "Админка";
-    adminBtn.onclick = () => showPage('admin');
-    document.getElementById('nav').appendChild(adminBtn);
-  }
-  const user = tg.initDataUnsafe?.user;
-
-  if (user) {
-    console.log("Telegram user:", user);
-
-    fetch("/api/user", {
+  async function addBalance() {
+    await fetch("/api/admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: user.id,
-        username: user.username
-      })
+        admin_id: ADMIN_ID,
+        action: "add_balance",
+        target: Number(userId.value),
+        amount: Number(amount.value),
+      }),
     });
+    alert("Баланс начислен");
   }
-  async function loadBalance() {
-  const user = tg.initDataUnsafe?.user;
-  if (!user) return;
 
-  const res = await fetch(`/api/balance?id=${user.id}`);
-  const data = await res.json();
-
-  document.getElementById("balance").innerText =
-    `⭐ ${data.balance} +`;
-}
-
-loadBalance();
-async function openCase(caseId) {
-  const user = tg.initDataUnsafe.user;
-
-  const res = await fetch("/api/open-case", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: user.id,
-      caseId
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.error) {
-    alert(data.error);
-  } else {
-    alert(`Ты выиграл: ${data.win} (+${data.value}⭐)`);
-    loadBalance();
+  async function removeBalance() {
+    await fetch("/api/admin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        admin_id: ADMIN_ID,
+        action: "remove_balance",
+        target: Number(userId.value),
+        amount: Number(amount.value),
+      }),
+    });
+    alert("Баланс уменьшен");
   }
-}
 
+  async function broadcast() {
+    await fetch("/api/broadcast", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        admin_id: ADMIN_ID,
+        text: broadcastText.value,
+      }),
+    });
+    alert("Рассылка отправлена");
+  }
 </script>
 
 </body>
