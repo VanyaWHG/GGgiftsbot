@@ -94,6 +94,26 @@ export default async function handler(req, res) {
         })
       });
     }
+// успешный платеж
+if (update.message?.successful_payment) {
+  const userId = update.message.from.id;
+  const stars = JSON.parse(
+    update.message.successful_payment.invoice_payload
+  ).stars;
+
+  const fee = Math.ceil(stars * 0.05);
+  const userGet = stars - fee;
+
+  // начисляем пользователю
+  await fetch(`${process.env.VERCEL_URL}/api/topup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId,
+      amount: stars
+    })
+  });
+}
 
     res.status(200).send("OK");
   } catch (e) {
