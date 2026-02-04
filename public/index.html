@@ -129,30 +129,24 @@
   }
 
  async function addBalance() {
-  const user = tg.initDataUnsafe?.user;
-  if (!user) return;
-
-  const amount = prompt("Сколько ⭐ пополнить?");
+  const amount = prompt("Введите сумму ⭐ (целое число)");
   if (!amount) return;
 
-  const res = await fetch("/api/topup", {
+  const res = await fetch("/api/create-invoice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: user.id,
-      amount
-    })
+    body: JSON.stringify({ amount })
   });
 
   const data = await res.json();
 
-  if (data.success) {
-    alert(`Зачислено ⭐${data.added}\nКомиссия ⭐${data.fee}`);
-    loadBalance();
+  if (data.invoice_link) {
+    tg.openInvoice(data.invoice_link);
   } else {
-    alert("Ошибка пополнения");
+    alert("Ошибка создания платежа");
   }
 }
+
   // админка только для тебя
   const ADMIN_USERNAME = "GGgiftsHelp";
   if (tg.initDataUnsafe?.user?.username === ADMIN_USERNAME) {
