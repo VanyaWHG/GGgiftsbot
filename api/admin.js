@@ -40,3 +40,22 @@ export default async function handler(req, res) {
 
   res.json({ success: true });
 }
+if (action === "search_user") {
+  // поиск пользователя
+}
+
+if (action === "get_user") {
+  // открыть профиль пользователя
+}
+
+if (action === "set_balance") {
+  // изменить баланс
+}
+
+if (action === "toggle_ban") {
+  // бан / разбан
+}
+
+if (action === "delete_item") {
+  // удалить предмет
+}
