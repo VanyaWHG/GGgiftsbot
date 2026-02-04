@@ -188,6 +188,27 @@
 }
 
 loadBalance();
+async function openCase(caseId) {
+  const user = tg.initDataUnsafe.user;
+
+  const res = await fetch("/api/open-case", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      caseId
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.error) {
+    alert(data.error);
+  } else {
+    alert(`Ты выиграл: ${data.win} (+${data.value}⭐)`);
+    loadBalance();
+  }
+}
 
 </script>
 
