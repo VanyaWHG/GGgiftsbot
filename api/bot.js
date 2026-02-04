@@ -56,7 +56,7 @@ export default async function handler(req, res) {
               [
                 {
                   text: "🤝 Сотрудничество / Поддержка",
-                  url: "https://t.me/GGgifts_help"
+                  url: "https://t.me/GGgiftsHelp"
                 }
               ]
             ]
