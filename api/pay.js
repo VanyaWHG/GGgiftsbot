@@ -2,10 +2,10 @@ export default async function handler(req, res) {
   const { user_id, amount } = req.body;
 
   const invoice = {
-    title: "Пополнение баланса GGgifts",
-    description: "Зачисление звёзд",
-    payload: "stars",
-    provider_token: "", // ПУСТО, ДЛЯ STARS
+    title: "Пополнение баланса",
+    description: "GGgifts",
+    payload: JSON.stringify({ user_id, amount }),
+    provider_token: "",
     currency: "XTR",
     prices: [{ label: "Stars", amount: amount * 100 }],
   };
