@@ -126,6 +126,20 @@ body {
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
+
+fetch(`/api/me?telegram_id=${tg.initDataUnsafe.user.id}`)
+  .then(r => r.json())
+  .then(user => {
+    if (user.is_admin) {
+      const adminBtn = document.createElement("div");
+      adminBtn.className = "nav";
+      adminBtn.innerText = "Админка";
+      adminBtn.onclick = () => {
+        window.location.href = "/admin.html";
+      };
+      document.querySelector(".bottom").appendChild(adminBtn);
+    }
+  });
 </script>
 
 </body>
