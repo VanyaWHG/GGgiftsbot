@@ -1,96 +1,56 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>GGgifts Admin</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body { background:#0f0f0f; color:#fff; font-family:Arial; padding:15px }
-    input, button { width:100%; padding:10px; margin-top:10px }
-    .user { padding:10px; border:1px solid #333; margin-top:10px; cursor:pointer }
-  </style>
 </head>
 <body>
+  <h2>Админка GGgifts</h2>
 
-<h2>👑 Админка</h2>
+  <input id="search" placeholder="ID или username" />
+  <button onclick="search()">Поиск</button>
 
-<input id="search" placeholder="username или telegram_id">
-<button onclick="find()">Найти</button>
+  <h3>Рассылка всем</h3>
+  <textarea id="broadcast" rows="4" cols="40"></textarea><br>
+  <button onclick="sendAll()">Отправить всем</button>
 
-<div id="results"></div>
-<div id="profile"></div>
+  <pre id="result"></pre>
 
-<script>
-const tg = window.Telegram.WebApp;
-const ADMIN_ID = tg.initDataUnsafe.user.id;
+  <script>
+    const ADMIN_ID = YOUR_TELEGRAM_ID; // ← ВСТАВЬ СВОЙ ID
 
-async function find() {
-  const res = await fetch("/api/admin-search", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ admin_id: ADMIN_ID, query: search.value })
-  });
-  const data = await res.json();
-  results.innerHTML = "";
-  data.forEach(u => {
-    const d = document.createElement("div");
-    d.className = "user";
-    d.innerText = `${u.username} (${u.telegram_id}) | ${u.balance} GG⭐`;
-    d.onclick = () => openUser(u.telegram_id);
-    results.appendChild(d);
-  });
-}
+    async function search() {
+      const target = document.getElementById("search").value;
 
-async function openUser(id) {
-  const res = await fetch("/api/admin-user", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ admin_id: ADMIN_ID, user_id: id })
-  });
-  const data = await res.json();
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          admin_id: ADMIN_ID,
+          action: "search_user",
+          target,
+        }),
+      });
 
-  profile.innerHTML = `
-    <h3>${data.user.username}</h3>
-    <p>Баланс: <input id="bal" value="${data.user.balance}"></p>
-    <button onclick="setBalance(${id})">Сохранить баланс</button>
-    <button onclick="toggleBan(${id})">
-      ${data.user.is_banned ? "Разблокировать" : "Заблокировать"}
-    </button>
-    <h4>Инвентарь</h4>
-    ${data.inventory.map(i =>
-      `<div>${i.item_name}
-       <button onclick="delItem(${id}, ${i.id})">❌</button></div>`
-    ).join("")}
-  `;
-}
+      document.getElementById("result").textContent =
+        JSON.stringify(await res.json(), null, 2);
+    }
 
-async function setBalance(id) {
-  await fetch("/api/admin-user", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      admin_id: ADMIN_ID,
-      user_id: id,
-      action: "set_balance",
-      value: Number(bal.value)
-    })
-  });
-  alert("Готово");
-}
+    async function sendAll() {
+      const text = document.getElementById("broadcast").value;
 
-async function toggleBan(id) {
-  await fetch("/api/admin-user", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      admin_id: ADMIN_ID,
-      user_id: id,
-      action: "toggle_ban"
-    })
-  });
-  alert("Готово");
-}
-</script>
+      await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          admin_id: ADMIN_ID,
+          action: "broadcast",
+          text,
+        }),
+      });
 
+      alert("Отправлено");
+    }
+  </script>
 </body>
 </html>
