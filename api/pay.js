@@ -2,12 +2,12 @@ export default async function handler(req, res) {
   const { user_id, amount } = req.body;
 
   const invoice = {
-    title: "Пополнение баланса",
-    description: "GGgifts",
+    title: "Пополнение GGgifts",
+    description: "Зачисление звёзд",
     payload: JSON.stringify({ user_id, amount }),
     provider_token: "",
     currency: "XTR",
-    prices: [{ label: "Stars", amount: amount * 100 }],
+    prices: [{ label: "Stars", amount: amount * 100 }]
   };
 
   const r = await fetch(
@@ -20,5 +20,5 @@ export default async function handler(req, res) {
   );
 
   const data = await r.json();
-  res.json({ invoice: data.result });
+  res.json({ link: data.result });
 }
