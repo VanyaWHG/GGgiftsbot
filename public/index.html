@@ -1,145 +1,172 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GGgifts</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GGgifts</title>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0e0e12;
-      color: white;
-      padding-bottom: 90px;
-    }
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #0b0d12;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-    /* HEADER */
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-    }
+/* ===== TOP BAR ===== */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: #11141b;
+}
 
-    .balance {
-      background: #1c1c24;
-      padding: 10px 16px;
-      border-radius: 25px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
-    }
+.logo {
+  font-weight: 700;
+  font-size: 18px;
+}
 
-    .balance button {
-      background: #7b5cff;
-      border: none;
-      color: white;
-      font-size: 22px;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      cursor: pointer;
-    }
+.balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1f2b;
+  padding: 6px 10px;
+  border-radius: 20px;
+}
 
-    /* CASES */
-    .cases {
-      display: flex;
-      gap: 16px;
-      padding: 20px;
-      overflow-x: auto;
-    }
+.balance span {
+  font-weight: 600;
+}
 
-    .case {
-      min-width: 220px;
-      height: 260px;
-      background: linear-gradient(180deg, #2a2a3a, #15151c);
-      border-radius: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 22px;
-    }
+.plus {
+  background: #2ea6ff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
 
-    /* BOTTOM MENU */
-    .bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #121218;
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      border-top: 1px solid #222;
-    }
+/* ===== CONTENT ===== */
+.content {
+  padding: 14px;
+  padding-bottom: 90px;
+}
 
-    .bottom div {
-      text-align: center;
-      font-size: 14px;
-      opacity: 0.7;
-    }
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
 
-    .bottom .active {
-      opacity: 1;
-      color: #7b5cff;
-    }
-  </style>
+.case {
+  background: #151924;
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+}
+
+.case img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.case-title {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* ===== BOTTOM MENU ===== */
+.bottom-menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #0f131d;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.menu-item {
+  text-align: center;
+  font-size: 12px;
+  opacity: .6;
+}
+
+.menu-item.active {
+  opacity: 1;
+}
+
+.menu-center {
+  background: #2ea6ff;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -30px;
+  color: white;
+  font-size: 22px;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <div class="top">
-    <div>🐸 GG</div>
+<div class="topbar">
+  <div class="logo">GGgifts</div>
+  <div class="balance">
+    ⭐ <span id="balance">50</span>
+    <div class="plus" onclick="topUp()">+</div>
+  </div>
+</div>
 
-    <div class="balance">
-      ⭐ <span id="stars">0</span>
-      <button onclick="pay()">+</button>
+<div class="content">
+  <div class="cases-grid">
+    <div class="case">
+      <img src="gggifts.jpg">
+      <div class="case-title">Кейс #1</div>
+    </div>
+    <div class="case">
+      <img src="gggifts.jpg">
+      <div class="case-title">Кейс #2</div>
+    </div>
+    <div class="case">
+      <img src="gggifts.jpg">
+      <div class="case-title">Кейс #3</div>
+    </div>
+    <div class="case">
+      <img src="gggifts.jpg">
+      <div class="case-title">Кейс #4</div>
     </div>
   </div>
+</div>
 
-  <!-- CASES -->
-  <div class="cases">
-    <div class="case">Кейс 1</div>
-    <div class="case">Кейс 2</div>
-    <div class="case">Кейс 3</div>
-  </div>
-
-  <!-- BOTTOM MENU -->
-  <div class="bottom">
-    <div>Апгрейд</div>
-    <div>Крафты</div>
-    <div class="active">Кейсы</div>
-    <div>Друзья</div>
-    <div>Профиль</div>
-  </div>
+<div class="bottom-menu">
+  <div class="menu-item">Апгрейд</div>
+  <div class="menu-item">Крафты</div>
+  <div class="menu-center">📦</div>
+  <div class="menu-item">Друзья</div>
+  <div class="menu-item">Профиль</div>
+</div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-  // Пример баланса (потом подключим реальный)
-  document.getElementById("stars").innerText = 50;
-
-  function pay() {
-    fetch("/api/pay", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: tg.initDataUnsafe.user.id,
-        amount: 100
-      })
-    })
-    .then(r => r.json())
-    .then(data => {
-      tg.openInvoice(data.invoice);
-    });
-  }
+function topUp() {
+  alert("Тут будет реальное пополнение ⭐");
+}
 </script>
 
 </body>
