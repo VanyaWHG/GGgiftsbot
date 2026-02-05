@@ -19,6 +19,17 @@ export default async function handler(req, res) {
     // /start
     if (update.message?.text?.startsWith("/start")) {
       const chatId = update.message.chat.id;
+// ⬇️ ДОБАВЛЯЕМ / ОБНОВЛЯЕМ ЮЗЕРА В БАЗЕ
+await supabase
+  .from("users")
+  .upsert({
+    telegram_id: update.message.from.id,
+    username: update.message.from.username || null,
+    balance: 0,
+    is_admin: false
+  }, {
+    onConflict: "telegram_id"
+  });
 
       await fetch(`${API}/sendPhoto`, {
         method: "POST",
