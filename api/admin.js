@@ -7,111 +7,88 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(200).json({ ok: true });
   }
 
-  const {
-    admin_id,
-    action,
-    target,   // telegram_id пользователя
-    amount,   // для +/-
-    value,    // для set_balance
-    query     // для поиска
-  } = req.body;
+  const { admin_id, action, target, amount, text } = req.body;
 
-  // 🔐 проверка админа
-  const { data: admin, error: adminError } = await supabase
+  // 1️⃣ проверка админа
+  const { data: admin } = await supabase
     .from("users")
-    .select("is_admin")
+    .select("*")
     .eq("telegram_id", admin_id)
     .single();
 
-  if (adminError || !admin || !admin.is_admin) {
+  if (!admin || !admin.is_admin) {
     return res.status(403).json({ error: "Not admin" });
   }
 
-  // 🔍 ПОИСК ПОЛЬЗОВАТЕЛЯ
+  // 2️⃣ поиск пользователя
   if (action === "search_user") {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("users")
-      .select("telegram_id, username, balance, is_banned")
-      .or(`username.ilike.%${query}%,telegram_id.eq.${query}`);
+      .select("*")
+      .or(
+        `telegram_id.eq.${target},username.ilike.%${target}%`
+      );
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    return res.json({ users: data });
+    return res.json(data);
   }
 
-  // 👤 ОТКРЫТЬ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+  // 3️⃣ получить профиль
   if (action === "get_user") {
-    const { data: user, error: userError } = await supabase
+    const { data } = await supabase
       .from("users")
       .select("*")
       .eq("telegram_id", target)
       .single();
 
-    if (userError) {
-      return res.status(500).json({ error: userError.message });
-    }
-
-    const { data: inventory } = await supabase
-      .from("inventory")
-      .select("*")
-      .eq("user_id", target);
-
-    return res.json({
-      user,
-      inventory: inventory || []
-    });
+    return res.json(data);
   }
 
-  // ➕ ДОБАВИТЬ БАЛАНС
-  if (action === "add_balance") {
-    await supabase.rpc("add_balance", {
-      user_id: target,
-      value: amount
-    });
-  }
-
-  // ➖ УБРАТЬ БАЛАНС
-  if (action === "remove_balance") {
-    await supabase.rpc("add_balance", {
-      user_id: target,
-      value: -amount
-    });
-  }
-
-  // ✏️ УСТАНОВИТЬ БАЛАНС НАПРЯМУЮ
+  // 4️⃣ установить баланс
   if (action === "set_balance") {
     await supabase
       .from("users")
-      .update({ balance: value })
+      .update({ balance: amount })
       .eq("telegram_id", target);
+
+    return res.json({ success: true });
   }
 
-  // 🚫 БАН / РАЗБАН
+  // 5️⃣ бан / разбан
   if (action === "toggle_ban") {
-    const { data: user } = await supabase
-      .from("users")
-      .select("is_banned")
-      .eq("telegram_id", target)
-      .single();
-
     await supabase
       .from("users")
-      .update({ is_banned: !user.is_banned })
+      .update({ banned: amount })
       .eq("telegram_id", target);
+
+    return res.json({ success: true });
   }
 
-  // ❌ УДАЛИТЬ ПРЕДМЕТ ИЗ ИНВЕНТАРЯ
-  if (action === "delete_item") {
-    await supabase
-      .from("inventory")
-      .delete()
-      .eq("id", value);
+  // 6️⃣ рассылка ВСЕМ
+  if (action === "broadcast") {
+    const { data: users } = await supabase
+      .from("users")
+      .select("telegram_id")
+      .neq("telegram_id", 0);
+
+    for (const u of users) {
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: u.telegram_id,
+            text,
+          }),
+        }
+      );
+    }
+
+    return res.json({ success: true });
   }
 
-  return res.json({ success: true });
+  res.json({ ok: true });
 }
