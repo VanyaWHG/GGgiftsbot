@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>GGgifts Admin</title>
+<meta charset="UTF-8">
+<title>Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  background: #0b0d12;
+  color: white;
+  font-family: Arial;
+  padding: 20px;
+}
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  background: #2ea6ff;
+  color: white;
+  font-weight: 600;
+}
+</style>
 </head>
+
 <body>
-  <h2>Админка GGgifts</h2>
 
-  <input id="search" placeholder="ID или username" />
-  <button onclick="search()">Поиск</button>
+<h2>Админка</h2>
 
-  <h3>Рассылка всем</h3>
-  <textarea id="broadcast" rows="4" cols="40"></textarea><br>
-  <button onclick="sendAll()">Отправить всем</button>
+<input id="search" placeholder="Юзернейм или ID">
+<button onclick="searchUser()">Найти пользователя</button>
 
-  <pre id="result"></pre>
+<hr>
 
-  <script>
-    const ADMIN_ID = YOUR_TELEGRAM_ID; // ← ВСТАВЬ СВОЙ ID
+<input id="broadcast" placeholder="Сообщение всем пользователям">
+<button onclick="sendAll()">Отправить всем</button>
 
-    async function search() {
-      const target = document.getElementById("search").value;
+<pre id="result"></pre>
 
-      const res = await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin_id: ADMIN_ID,
-          action: "search_user",
-          target,
-        }),
-      });
+<script>
+const ADMIN_ID = 7461986138;
 
-      document.getElementById("result").textContent =
-        JSON.stringify(await res.json(), null, 2);
-    }
+async function searchUser() {
+  const q = document.getElementById('search').value;
 
-    async function sendAll() {
-      const text = document.getElementById("broadcast").value;
+  const r = await fetch('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      admin_id: ADMIN_ID,
+      action: 'search_user',
+      query: q
+    })
+  });
 
-      await fetch("/api/admin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin_id: ADMIN_ID,
-          action: "broadcast",
-          text,
-        }),
-      });
+  document.getElementById('result').textContent =
+    JSON.stringify(await r.json(), null, 2);
+}
 
-      alert("Отправлено");
-    }
-  </script>
+async function sendAll() {
+  const text = document.getElementById('broadcast').value;
+
+  const r = await fetch('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      admin_id: ADMIN_ID,
+      action: 'broadcast',
+      text
+    })
+  });
+
+  alert('Отправлено');
+}
+</script>
+
 </body>
 </html>
