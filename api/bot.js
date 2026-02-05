@@ -5,7 +5,6 @@ export const config = {
 };
 
 import fetch from "node-fetch";
-
 import { createClient } from "@supabase/supabase-js";
 
 const TOKEN = process.env.BOT_TOKEN;
