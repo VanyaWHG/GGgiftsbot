@@ -2,198 +2,144 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GGgifts</title>
 
-  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f0f0f;
+      background: #0e0e12;
       color: white;
+      padding-bottom: 90px;
     }
 
-    /* TOP BAR */
-    #topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 56px;
-      background: #121212;
+    /* HEADER */
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .balance {
+      background: #1c1c24;
+      padding: 10px 16px;
+      border-radius: 25px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      border-bottom: 1px solid #222;
-      z-index: 10;
-    }
-
-    #logo {
+      gap: 10px;
       font-size: 18px;
-      font-weight: bold;
+    }
+
+    .balance button {
+      background: #7b5cff;
+      border: none;
+      color: white;
+      font-size: 22px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
       cursor: pointer;
     }
 
-    #balance {
-      font-size: 14px;
-      background: #1c1c1c;
-      padding: 6px 10px;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-
-    /* CONTENT */
-    #content {
-      padding-top: 70px;
-      padding-bottom: 80px;
-      text-align: center;
-    }
-
-    .page {
-      display: none;
+    /* CASES */
+    .cases {
+      display: flex;
+      gap: 16px;
       padding: 20px;
+      overflow-x: auto;
     }
 
-    .page.active {
-      display: block;
+    .case {
+      min-width: 220px;
+      height: 260px;
+      background: linear-gradient(180deg, #2a2a3a, #15151c);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
     }
 
-    /* NAV BAR */
-    #nav {
+    /* BOTTOM MENU */
+    .bottom {
       position: fixed;
       bottom: 0;
       left: 0;
-      width: 100%;
-      height: 64px;
+      right: 0;
+      background: #121218;
       display: flex;
-      background: #121212;
+      justify-content: space-around;
+      padding: 12px 0;
       border-top: 1px solid #222;
     }
 
-    #nav button {
-      flex: 1;
-      background: #1c1c1c;
-      color: #aaa;
-      border: none;
-      font-size: 12px;
+    .bottom div {
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.7;
     }
 
-    #nav button.main {
-      flex: 1.4;
-      background: #2ea6ff;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
+    .bottom .active {
+      opacity: 1;
+      color: #7b5cff;
     }
   </style>
 </head>
+
 <body>
 
-<!-- TOP -->
-<div id="topbar">
-  <div id="logo" onclick="showPage('cases')">GGgifts</div>
-  <div id="balance" onclick="addBalance()">⭐ 0 +</div>
-</div>
+  <!-- HEADER -->
+  <div class="top">
+    <div>🐸 GG</div>
 
-<!-- CONTENT -->
-<div id="content">
-  <div id="cases" class="page active">🎁 <h2>Кейсы</h2></div>
-  <div id="upgrade" class="page">🚀 <h2>Апгрейд</h2></div>
-  <div id="craft" class="page">🛠 <h2>Крафты</h2></div>
-  <div id="profile" class="page">👤 <h2>Профиль</h2></div>
-  <div id="settings" class="page">⚙️ <h2>Настройки</h2></div>
-  <div id="admin" class="page">🛡 <h2>Админка</h2></div>
-</div>
+    <div class="balance">
+      ⭐ <span id="stars">0</span>
+      <button onclick="pay()">+</button>
+    </div>
+  </div>
 
-<!-- NAV -->
-<div id="nav">
-  <button onclick="showPage('upgrade')">Апгрейд</button>
-  <button class="main" onclick="showPage('cases')">Кейсы</button>
-  <button onclick="showPage('craft')">Крафты</button>
-  <button onclick="showPage('profile')">Профиль</button>
-  <button onclick="showPage('settings')">Настройки</button>
-</div>
+  <!-- CASES -->
+  <div class="cases">
+    <div class="case">Кейс 1</div>
+    <div class="case">Кейс 2</div>
+    <div class="case">Кейс 3</div>
+  </div>
 
-<button onclick="pay()">+</button>
+  <!-- BOTTOM MENU -->
+  <div class="bottom">
+    <div>Апгрейд</div>
+    <div>Крафты</div>
+    <div class="active">Кейсы</div>
+    <div>Друзья</div>
+    <div>Профиль</div>
+  </div>
 
 <script>
-const tg = window.Telegram.WebApp;
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-function pay() {
-  fetch("/api/pay", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      user_id: tg.initDataUnsafe.user.id,
-      amount: 100 // например 100 ⭐, потом сделаем ввод
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    tg.openInvoice(data.invoice);
-  });
-}
+  // Пример баланса (потом подключим реальный)
+  document.getElementById("stars").innerText = 50;
 
-  // админка только для тебя
-  const ADMIN_USERNAME = "GGgiftsHelp";
-  if (tg.initDataUnsafe?.user?.username === ADMIN_USERNAME) {
-    const adminPage = document.getElementById('admin');
-    const adminBtn = document.createElement('button');
-    adminBtn.textContent = "Админка";
-    adminBtn.onclick = () => showPage('admin');
-    document.getElementById('nav').appendChild(adminBtn);
-  }
-  const user = tg.initDataUnsafe?.user;
-
-  if (user) {
-    console.log("Telegram user:", user);
-
-    fetch("/api/user", {
+  function pay() {
+    fetch("/api/pay", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: user.id,
-        username: user.username
+        user_id: tg.initDataUnsafe.user.id,
+        amount: 100
       })
+    })
+    .then(r => r.json())
+    .then(data => {
+      tg.openInvoice(data.invoice);
     });
   }
-  async function loadBalance() {
-  const user = tg.initDataUnsafe?.user;
-  if (!user) return;
-
-  const res = await fetch(`/api/balance?id=${user.id}`);
-  const data = await res.json();
-
-  document.getElementById("balance").innerText =
-    `⭐ ${data.balance} +`;
-}
-
-loadBalance();
-async function openCase(caseId) {
-  const user = tg.initDataUnsafe.user;
-
-  const res = await fetch("/api/open-case", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: user.id,
-      caseId
-    })
-  });
-
-  const data = await res.json();
-
-  if (data.error) {
-    alert(data.error);
-  } else {
-    alert(`Ты выиграл: ${data.win} (+${data.value}⭐)`);
-    loadBalance();
-  }
-}
-
 </script>
 
 </body>
