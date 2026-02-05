@@ -117,34 +117,24 @@
   <button onclick="showPage('settings')">Настройки</button>
 </div>
 
+<button onclick="pay()">+</button>
+
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
+const tg = window.Telegram.WebApp;
 
-  const pages = document.querySelectorAll('.page');
-
-  function showPage(id) {
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
- async function addBalance() {
-  const amount = prompt("Введите сумму ⭐ (целое число)");
-  if (!amount) return;
-
-  const res = await fetch("/api/create-invoice", {
+function pay() {
+  fetch("/api/pay", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount })
+    body: JSON.stringify({
+      user_id: tg.initDataUnsafe.user.id,
+      amount: 100 // например 100 ⭐, потом сделаем ввод
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    tg.openInvoice(data.invoice);
   });
-
-  const data = await res.json();
-
-  if (data.invoice_link) {
-    tg.openInvoice(data.invoice_link);
-  } else {
-    alert("Ошибка создания платежа");
-  }
 }
 
   // админка только для тебя
