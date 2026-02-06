@@ -23,16 +23,18 @@ export default async function handler(req, res) {
   if (!admin || !admin.is_admin) {
     return res.status(403).json({ error: "Not admin" });
   }
-
-  // Поиск пользователя
+  
   if (action === "search") {
-    const { data } = await supabase
-      .from("users")
-      .select("*")
-      .or(`telegram_id.eq.${target},username.ilike.%${target}%`);
+  const clean = target.replace("@", "");
 
-    return res.json(data);
-  }
+  const { data } = await supabase
+    .from("users")
+    .select("*")
+    .or(`telegram_id.eq.${clean},username.ilike.%${clean}%`);
+
+  return res.json(data || []);
+}
+
 
   // Получить профиль
   if (action === "get") {
