@@ -6,13 +6,12 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { telegram_id } = req.query;
+  const { userId, amount } = req.body;
 
-  const { data } = await supabase
-    .from("users")
-    .select("*")
-    .eq("telegram_id", telegram_id)
-    .single();
+  await supabase.rpc("add_balance", {
+    user_id: userId,
+    value: amount
+  });
 
-  res.json(data);
+  res.json({ success: true });
 }
