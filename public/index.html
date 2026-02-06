@@ -13,15 +13,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* HEADER */
-
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 90px;
-  background: linear-gradient(180deg,#111827,#0b0f17);
+  background: #111;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,42 +28,31 @@ body {
 }
 
 .logo {
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.balance {
+  background: #1c1c1c;
+  padding: 14px 22px;
+  border-radius: 40px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
   font-size: 22px;
   font-weight: 700;
 }
 
-/* БАЛАНС */
-
-.balance {
-  background: #1f2937;
-  padding: 12px 22px;
-  border-radius: 40px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-/* КНОПКА + БОЛЬШАЯ И НИЖЕ */
-
 .plus {
-  background: linear-gradient(145deg,#3b82f6,#2563eb);
-  width: 44px;
-  height: 44px;
+  background: #2ea6ff;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26px;
-  cursor: pointer;
-  margin-top: 6px; /* опускаем ниже */
-  box-shadow: 0 8px 20px rgba(59,130,246,0.6);
-  transition: 0.2s;
-}
-
-.plus:active {
-  transform: scale(0.9);
+  font-weight: bold;
 }
 
 /* КОНТЕНТ */
