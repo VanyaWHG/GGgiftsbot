@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     payload: JSON.stringify({ stars: amount }),
     provider_token: "",
     currency: "XTR",
-    prices: [{ label: "Stars", amount: amount * 100 }]
+    prices: [{ label: "Stars", amount: parseInt(amount) }]
   };
 
   const response = await fetch(
