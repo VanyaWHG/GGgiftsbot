@@ -4,15 +4,15 @@ export default async function handler(req, res) {
   const { amount } = req.body;
 
   const invoice = {
-    title: "Пополнение GGgifts",
-    description: "Зачисление звёзд",
+    title: "Пополнение баланса GGgifts",
+    description: "Зачисление Telegram Stars",
     payload: JSON.stringify({ stars: amount }),
     provider_token: "",
     currency: "XTR",
     prices: [{ label: "Stars", amount: amount * 100 }]
   };
 
-  const r = await fetch(
+  const response = await fetch(
     `https://api.telegram.org/bot${process.env.BOT_TOKEN}/createInvoiceLink`,
     {
       method: "POST",
@@ -21,6 +21,7 @@ export default async function handler(req, res) {
     }
   );
 
-  const data = await r.json();
+  const data = await response.json();
+
   res.json({ invoice: data.result });
 }
