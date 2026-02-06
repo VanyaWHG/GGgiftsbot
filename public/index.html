@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>GGgifts</title>
@@ -7,91 +7,96 @@
 
 <style>
 body {
-  margin: 0;
-  background: #0e0e0e;
-  color: white;
-  font-family: Arial, sans-serif;
+  margin:0;
+  background:#0b0f18;
+  font-family:Arial;
+  color:white;
 }
 
+/* HEADER */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px;
-  z-index: 10;
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 15px;
+  background:linear-gradient(90deg,#0f172a,#1e293b);
 }
 
-.balance {
-  background: #1c1c1c;
-  padding: 6px 12px;
-  border-radius: 20px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.logo {
+  font-size:20px;
+  font-weight:700;
+}
+
+.balance-box {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#1e293b;
+  padding:8px 14px;
+  border-radius:20px;
+  font-weight:600;
 }
 
 .plus {
-  background: #2ea6ff;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  background:#3b82f6;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
 }
 
+/* CASE GRID */
 .content {
-  padding-top: 70px;
-  padding-bottom: 90px;
+  padding:15px;
+  padding-bottom:110px;
 }
 
 .cases {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  padding: 15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
 }
 
 .case {
-  background: #1a1a1a;
-  border-radius: 16px;
-  height: 160px;
+  height:170px;
+  border-radius:18px;
+  background:#1e293b;
 }
 
+/* BOTTOM NAV */
 .bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 80px;
-  background: #111;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:90px;
+  background:#0f172a;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
 }
 
 .nav {
-  color: #777;
-  font-size: 12px;
+  text-align:center;
+  font-size:12px;
+  color:#9ca3af;
 }
 
-.nav.center {
-  background: #2ea6ff;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+.center-btn {
+  width:70px;
+  height:70px;
+  background:#3b82f6;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:14px;
+  color:white;
 }
 </style>
 </head>
@@ -99,10 +104,11 @@ body {
 <body>
 
 <div class="header">
-  <div>GGgifts</div>
-  <div class="balance">
-    ⭐ 50
-    <div class="plus">+</div>
+  <div class="logo">GGgifts</div>
+
+  <div class="balance-box">
+    ⭐ <span id="balance">0</span>
+    <div class="plus" onclick="topUp()">+</div>
   </div>
 </div>
 
@@ -118,7 +124,7 @@ body {
 <div class="bottom">
   <div class="nav">Апгрейд</div>
   <div class="nav">Крафты</div>
-  <div class="nav center">Кейсы</div>
+  <div class="center-btn">Кейсы</div>
   <div class="nav">Друзья</div>
   <div class="nav">Профиль</div>
 </div>
@@ -127,19 +133,37 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-fetch(`/api/me?telegram_id=${tg.initDataUnsafe.user.id}`)
-  .then(r => r.json())
-  .then(user => {
-    if (user.is_admin) {
-      const adminBtn = document.createElement("div");
-      adminBtn.className = "nav";
-      adminBtn.innerText = "Админка";
-      adminBtn.onclick = () => {
-        window.location.href = "/admin.html";
-      };
-      document.querySelector(".bottom").appendChild(adminBtn);
-    }
+const user = tg.initDataUnsafe.user;
+
+async function loadUser() {
+  const r = await fetch("/api/getUser", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      telegram_id: user.id
+    })
   });
+
+  const data = await r.json();
+  document.getElementById("balance").innerText = data.balance;
+}
+
+async function topUp() {
+  const amount = prompt("Введите количество звёзд");
+
+  if(!amount) return;
+
+  const r = await fetch("/api/pay", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ amount })
+  });
+
+  const data = await r.json();
+  tg.openInvoice(data.invoice);
+}
+
+loadUser();
 </script>
 
 </body>
