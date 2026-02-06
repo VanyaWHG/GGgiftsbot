@@ -1,10 +1,12 @@
+import fetch from "node-fetch";
+
 export default async function handler(req, res) {
-  const { user_id, amount } = req.body;
+  const { amount } = req.body;
 
   const invoice = {
     title: "Пополнение GGgifts",
     description: "Зачисление звёзд",
-    payload: JSON.stringify({ user_id, amount }),
+    payload: JSON.stringify({ stars: amount }),
     provider_token: "",
     currency: "XTR",
     prices: [{ label: "Stars", amount: amount * 100 }]
@@ -15,10 +17,10 @@ export default async function handler(req, res) {
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(invoice),
+      body: JSON.stringify(invoice)
     }
   );
 
   const data = await r.json();
-  res.json({ link: data.result });
+  res.json({ invoice: data.result });
 }
