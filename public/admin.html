@@ -1,5 +1,110 @@
-body: JSON.stringify({
-  admin_id: ADMIN_ID,
-  action: 'search_user',
-  target: q // ❗ НЕ query
-})
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GGgifts Admin</title>
+<style>
+body { background:#0f1116; color:white; font-family:Arial; padding:20px; }
+input,button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; }
+button { background:#2ea6ff; color:white; font-weight:600; }
+.card { background:#1a1d24; padding:15px; border-radius:12px; margin-top:15px; }
+</style>
+</head>
+<body>
+
+<h2>Админка GGgifts</h2>
+
+<input id="search" placeholder="ID или username">
+<button onclick="searchUser()">Найти</button>
+
+<div id="userCard"></div>
+
+<hr>
+
+<input id="broadcastText" placeholder="Сообщение всем">
+<button onclick="sendAll()">Отправить всем</button>
+
+<script>
+const ADMIN_ID = 7461986138;
+
+async function searchUser() {
+  const val = document.getElementById("search").value;
+
+  const r = await fetch("/api/admin", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      admin_id: ADMIN_ID,
+      action:"search",
+      target:val
+    })
+  });
+
+  const data = await r.json();
+  if(!data.length) return alert("Не найдено");
+
+  showProfile(data[0]);
+}
+
+function showProfile(user){
+  document.getElementById("userCard").innerHTML = `
+    <div class="card">
+      <b>ID:</b> ${user.telegram_id}<br>
+      <b>Username:</b> ${user.username}<br>
+      <b>Balance:</b> ${user.balance}<br>
+      <br>
+      <input id="newBalance" placeholder="Новый баланс">
+      <button onclick="setBalance(${user.telegram_id})">Изменить баланс</button>
+      <button onclick="toggleBan(${user.telegram_id}, ${!user.banned})">
+        ${user.banned ? "Разбанить" : "Забанить"}
+      </button>
+    </div>
+  `;
+}
+
+async function setBalance(id){
+  const val = document.getElementById("newBalance").value;
+  await fetch("/api/admin",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      admin_id:ADMIN_ID,
+      action:"set_balance",
+      target:id,
+      amount:parseInt(val)
+    })
+  });
+  alert("Баланс изменен");
+}
+
+async function toggleBan(id,state){
+  await fetch("/api/admin",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      admin_id:ADMIN_ID,
+      action:"toggle_ban",
+      target:id,
+      amount:state
+    })
+  });
+  alert("Готово");
+}
+
+async function sendAll(){
+  const text=document.getElementById("broadcastText").value;
+  await fetch("/api/admin",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      admin_id:ADMIN_ID,
+      action:"broadcast",
+      text
+    })
+  });
+  alert("Отправлено");
+}
+</script>
+
+</body>
+</html>
