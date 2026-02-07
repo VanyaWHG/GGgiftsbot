@@ -105,13 +105,12 @@ if (action === "broadcast") {
 
   const { data: users } = await supabase
     .from("users")
-    .select("telegram_id")
-    .neq("telegram_id", 0);
+    .select("telegram_id");
 
   for (const u of users) {
 
-    // если есть фото
     if (req.body.photo) {
+      // если фото как ссылка (на всякий случай)
       await fetch(
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
         {
@@ -119,12 +118,30 @@ if (action === "broadcast") {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: u.telegram_id,
-            photo: req.body.photo, // ссылка на фото
+            photo: req.body.photo,
             caption: text || ""
           }),
         }
       );
-    } else {
+    }
+
+    else if (req.files?.photo) {
+      // если реальный файл
+      const form = new FormData();
+      form.append("chat_id", u.telegram_id);
+      form.append("photo", req.files.photo.data);
+      form.append("caption", text || "");
+
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
+        {
+          method: "POST",
+          body: form
+        }
+      );
+    }
+
+    else {
       await fetch(
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
         {
@@ -138,7 +155,7 @@ if (action === "broadcast") {
       );
     }
   }
-  
-  res.json({ ok: true });
-  }
+
+  return res.json({ ok: true });
 }
+
