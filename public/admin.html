@@ -48,46 +48,53 @@ async function searchUser() {
     return;
   }
 
-  let html = `
-  ID: ${data.user.telegram_id}
-  Баланс: ${data.user.balance}
+  showProfile(data.user, data.inventory);
+}
 
-  ===== ИНВЕНТАРЬ =====
-  `;
+function showProfile(user, inventory){
 
-  if (data.inventory.length === 0) {
-    html += "\nНет предметов";
+  let itemsHtml = "";
+
+  if (!inventory || inventory.length === 0) {
+    itemsHtml = "Нет предметов";
+  } else {
+    inventory.forEach(item => {
+      itemsHtml += `
+        <div style="margin-top:10px;padding:10px;background:#222;border-radius:8px;">
+          ${item.item_name}
+          <br>
+          <button onclick="deleteItem(${item.id})">
+            Забрать предмет
+          </button>
+        </div>
+      `;
+    });
   }
 
-  data.inventory.forEach(item => {
-    html += `
-ID предмета: ${item.id}
-Название: ${item.name}
------------------------
-`;
-  });
-
-  document.getElementById('result').textContent = html;
-}
-
-  showProfile(data[0]);
-}
-
-function showProfile(user){
   document.getElementById("userCard").innerHTML = `
     <div class="card">
       <b>ID:</b> ${user.telegram_id}<br>
-      <b>Username:</b> ${user.username}<br>
+      <b>Username:</b> ${user.username || "-"}<br>
       <b>Balance:</b> ${user.balance}<br>
       <br>
+
       <input id="newBalance" placeholder="Новый баланс">
-      <button onclick="setBalance(${user.telegram_id})">Изменить баланс</button>
+      <button onclick="setBalance(${user.telegram_id})">
+        Изменить баланс
+      </button>
+
       <button onclick="toggleBan(${user.telegram_id}, ${!user.banned})">
         ${user.banned ? "Разбанить" : "Забанить"}
       </button>
+
+      <hr>
+
+      <b>Инвентарь:</b>
+      ${itemsHtml}
     </div>
   `;
 }
+
 
 async function setBalance(id){
   const val = document.getElementById("newBalance").value;
