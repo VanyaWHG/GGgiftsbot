@@ -35,18 +35,34 @@ export default async function handler(req, res) {
   return res.json(data || []);
 }
 
+if (action === "get_user") {
 
- if (action === "get_user") {
-  const { data: user } = await supabase
+  const clean = String(target).replace("@", "");
+
+  let { data: user } = await supabase
     .from("users")
     .select("*")
-    .eq("telegram_id", target)
+    .eq("telegram_id", clean)
     .single();
+
+  if (!user) {
+    const { data } = await supabase
+      .from("users")
+      .select("*")
+      .ilike("username", clean)
+      .limit(1);
+
+    user = data?.[0];
+  }
+
+  if (!user) {
+    return res.json({ user: null });
+  }
 
   const { data: inventory } = await supabase
     .from("inventory")
     .select("*")
-    .eq("telegram_id", target);
+    .eq("telegram_id", user.telegram_id);
 
   return res.json({
     user,
