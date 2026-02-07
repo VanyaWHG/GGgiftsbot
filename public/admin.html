@@ -22,7 +22,7 @@ button { background:#2ea6ff; color:white; font-weight:600; }
 <hr>
 
 <input id="broadcastText" placeholder="Сообщение всем">
-<input id="photo" placeholder="Ссылка на фото (необязательно)">
+<input type="file" id="photoFile" accept="image/*">
 <button onclick="sendAll()">Отправить всем</button>
 
 <script>
@@ -139,23 +139,29 @@ async function toggleBan(id,state){
   alert("Предмет удалён");
 }
 
-  async function sendAll() {
+  <script>
+async function sendAll() {
   const text = document.getElementById("broadcastText").value;
-  const photo = document.getElementById("photo").value;
+  const fileInput = document.getElementById("photoFile");
 
-  await fetch("/api/admin", {
+  const formData = new FormData();
+  formData.append("admin_id", ADMIN_ID);
+  formData.append("action", "broadcast");
+  formData.append("text", text);
+
+  if (fileInput.files.length > 0) {
+    formData.append("photo", fileInput.files[0]);
+  }
+
+  const r = await fetch("/api/admin", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      admin_id: ADMIN_ID,
-      action: "broadcast",
-      text: text,
-      photo: photo
-    })
+    body: formData
   });
 
+  const data = await r.json();
   alert("Рассылка отправлена");
 }
+</script>
 
 </script>
 
