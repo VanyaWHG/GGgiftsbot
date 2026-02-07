@@ -91,19 +91,6 @@ async function toggleBan(id,state){
   alert("Готово");
 }
 
-async function sendAll(){
-  const text=document.getElementById("broadcastText").value;
-  await fetch("/api/admin",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      admin_id:ADMIN_ID,
-      action:"broadcast",
-      text
-    })
-  });
-  alert("Отправлено");
-}
 </script>
 
 </body>
