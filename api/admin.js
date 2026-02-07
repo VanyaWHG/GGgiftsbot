@@ -110,7 +110,6 @@ if (action === "broadcast") {
   for (const u of users) {
 
     if (req.body.photo) {
-      // если фото как ссылка (на всякий случай)
       await fetch(
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
         {
@@ -123,25 +122,7 @@ if (action === "broadcast") {
           }),
         }
       );
-    }
-
-    else if (req.files?.photo) {
-      // если реальный файл
-      const form = new FormData();
-      form.append("chat_id", u.telegram_id);
-      form.append("photo", req.files.photo.data);
-      form.append("caption", text || "");
-
-      await fetch(
-        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
-        {
-          method: "POST",
-          body: form
-        }
-      );
-    }
-
-    else {
+    } else {
       await fetch(
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
         {
