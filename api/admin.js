@@ -67,13 +67,31 @@ export default async function handler(req, res) {
     return res.json({ success: true });
   }
 
-  // Рассылка
-  if (action === "broadcast") {
-    const { data: users } = await supabase
-      .from("users")
-      .select("telegram_id");
+// 6️⃣ рассылка ВСЕМ (текст + фото)
+if (action === "broadcast") {
 
-    for (const u of users) {
+  const { data: users } = await supabase
+    .from("users")
+    .select("telegram_id")
+    .neq("telegram_id", 0);
+
+  for (const u of users) {
+
+    // если есть фото
+    if (req.body.photo) {
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: u.telegram_id,
+            photo: req.body.photo, // ссылка на фото
+            caption: text || ""
+          }),
+        }
+      );
+    } else {
       await fetch(
         `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
         {
@@ -81,14 +99,12 @@ export default async function handler(req, res) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: u.telegram_id,
-            text
-          })
+            text,
+          }),
         }
       );
     }
-
-    return res.json({ success: true });
   }
 
-  res.json({ ok: true });
+  return res.json({ success: true });
 }
