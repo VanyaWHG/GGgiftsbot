@@ -118,6 +118,20 @@ async function toggleBan(id,state){
   alert("Готово");
 }
 
+  async function deleteItem(itemId) {
+  await fetch('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      admin_id: ADMIN_ID,
+      action: 'delete_item',
+      target: itemId
+    })
+  });
+
+  alert("Предмет удалён");
+}
+
 </script>
 
 </body>
