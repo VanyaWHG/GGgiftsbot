@@ -163,9 +163,11 @@ body {
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const user = tg.initDataUnsafe.user;
+const user = tg.initDataUnsafe?.user;
 
 async function loadUser() {
+  if (!user) return;
+
   const r = await fetch("/api/getUser", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
@@ -175,7 +177,7 @@ async function loadUser() {
   });
 
   const data = await r.json();
-  document.getElementById("balance").innerText = data.balance;
+  document.getElementById("balance").innerText = data.balance ?? 0;
 }
 
 async function topUp() {
@@ -186,7 +188,7 @@ async function topUp() {
   const r = await fetch("/api/pay", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ amount })
+    body:JSON.stringify({ amount: Number(amount) })
   });
 
   const data = await r.json();
@@ -194,14 +196,6 @@ async function topUp() {
 }
 
 loadUser();
-  
-  const tg = window.Telegram.WebApp;
-tg.expand();
-
-if (tg.initDataUnsafe?.user?.photo_url) {
-  document.getElementById("avatar").src =
-    tg.initDataUnsafe.user.photo_url;
-}
 </script>
 
 </body>
