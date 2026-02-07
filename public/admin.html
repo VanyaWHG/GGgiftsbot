@@ -29,20 +29,46 @@ button { background:#2ea6ff; color:white; font-weight:600; }
 const ADMIN_ID = 7461986138;
 
 async function searchUser() {
-  const val = document.getElementById("search").value;
+  const q = document.getElementById('search').value;
 
-  const r = await fetch("/api/admin", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
+  const r = await fetch('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       admin_id: ADMIN_ID,
-      action:"search",
-      target:val
+      action: 'get_user',
+      target: q
     })
   });
 
   const data = await r.json();
-  if(!data.length) return alert("Не найдено");
+
+  if (!data.user) {
+    alert("Пользователь не найден");
+    return;
+  }
+
+  let html = `
+  ID: ${data.user.telegram_id}
+  Баланс: ${data.user.balance}
+
+  ===== ИНВЕНТАРЬ =====
+  `;
+
+  if (data.inventory.length === 0) {
+    html += "\nНет предметов";
+  }
+
+  data.inventory.forEach(item => {
+    html += `
+ID предмета: ${item.id}
+Название: ${item.name}
+-----------------------
+`;
+  });
+
+  document.getElementById('result').textContent = html;
+}
 
   showProfile(data[0]);
 }
