@@ -36,16 +36,23 @@ export default async function handler(req, res) {
 }
 
 
-  // Получить профиль
-  if (action === "get") {
-    const { data } = await supabase
-      .from("users")
-      .select("*")
-      .eq("telegram_id", target)
-      .single();
+ if (action === "get_user") {
+  const { data: user } = await supabase
+    .from("users")
+    .select("*")
+    .eq("telegram_id", target)
+    .single();
 
-    return res.json(data);
-  }
+  const { data: inventory } = await supabase
+    .from("inventory")
+    .select("*")
+    .eq("telegram_id", target);
+
+  return res.json({
+    user,
+    inventory
+  });
+}
 
   // Изменить баланс
   if (action === "set_balance") {
