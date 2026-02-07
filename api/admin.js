@@ -74,6 +74,16 @@ export default async function handler(req, res) {
     return res.json({ success: true });
   }
 
+  // Удаление предмета
+if (action === "delete_item") {
+  await supabase
+    .from("inventory")
+    .delete()
+    .eq("id", target);
+
+  return res.json({ success: true });
+}
+
 // 6️⃣ рассылка ВСЕМ (текст + фото)
 if (action === "broadcast") {
 
@@ -112,15 +122,6 @@ if (action === "broadcast") {
       );
     }
   }
-
-  if (action === "delete_item") {
-  await supabase
-    .from("inventory")
-    .delete()
-    .eq("id", target);
-
-  return res.json({ success: true });
-}
-
+  
   res.json({ ok: true });
 }
