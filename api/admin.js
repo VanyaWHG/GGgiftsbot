@@ -100,6 +100,40 @@ if (action === "delete_item") {
   return res.json({ success: true });
 }
 
+  // Продажа предмета
+if (action === "sell_item") {
+
+  const { data: item } = await supabase
+    .from("inventory")
+    .select("*")
+    .eq("id", target)
+    .single();
+
+  if (!item) {
+    return res.json({ error: "Item not found" });
+  }
+
+  // удаляем предмет
+  await supabase
+    .from("inventory")
+    .delete()
+    .eq("id", target);
+
+  // добавляем баланс
+  const { data: user } = await supabase
+    .from("users")
+    .select("balance")
+    .eq("telegram_id", item.telegram_id)
+    .single();
+
+  await supabase
+    .from("users")
+    .update({ balance: user.balance + item.item_value })
+    .eq("telegram_id", item.telegram_id);
+
+  return res.json({ success: true });
+}
+
 // 6️⃣ рассылка ВСЕМ (текст + фото)
 if (action === "broadcast") {
 
