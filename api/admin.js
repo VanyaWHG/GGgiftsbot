@@ -113,5 +113,14 @@ if (action === "broadcast") {
     }
   }
 
+  if (action === "delete_item") {
+  await supabase
+    .from("inventory")
+    .delete()
+    .eq("id", target);
+
   return res.json({ success: true });
+}
+
+  res.json({ ok: true });
 }
