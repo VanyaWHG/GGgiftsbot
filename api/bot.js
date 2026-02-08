@@ -85,6 +85,20 @@ export default async function handler(req, res) {
         })
       });
 
+// ===== PRE CHECKOUT =====
+if (update.pre_checkout_query) {
+  await fetch(`${API}/answerPreCheckoutQuery`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      pre_checkout_query_id: update.pre_checkout_query.id,
+      ok: true
+    })
+  });
+
+  return res.status(200).send("OK");
+}
+
       await fetch(`${API}/answerCallbackQuery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
