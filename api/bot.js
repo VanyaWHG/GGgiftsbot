@@ -94,16 +94,19 @@ export default async function handler(req, res) {
       });
     }
 
-    // ====== УСПЕШНЫЙ ПЛАТЁЖ ======
-    if (update.message?.successful_payment) {
-      const userId = update.message.from.id;
-      const amount = parseInt(update.message.successful_payment.total_amount / 100);
+  if (update.message?.successful_payment) {
+  const userId = update.message.from.id;
 
-      await supabase.rpc("add_balance", {
-        user_id: userId,
-        value: amount
-      });
-    }
+  const amount = parseInt(
+    update.message.successful_payment.total_amount
+  );
+
+  await supabase.rpc("add_balance", {
+    user_id: userId,
+    value: amount
+  });
+}
+
 
     res.status(200).send("OK");
 
