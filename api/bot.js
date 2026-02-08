@@ -85,7 +85,8 @@ export default async function handler(req, res) {
         })
       });
 
-// ===== PRE CHECKOUT =====
+
+      // ===== PRE CHECKOUT =====
 if (update.pre_checkout_query) {
   await fetch(`${API}/answerPreCheckoutQuery`, {
     method: "POST",
