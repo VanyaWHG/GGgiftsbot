@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         "🤝 Сотрудничество — @GGgifts_help"
         })
       });
-    }
+}
 
       // ===== PRE CHECKOUT =====
 if (update.pre_checkout_query) {
