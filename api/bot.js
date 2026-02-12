@@ -65,48 +65,50 @@ export default async function handler(req, res) {
           }
         })
       });
+
+      return res.status(200).send("OK");
     }
 
-  // ===== PRE CHECKOUT =====
-if (update.pre_checkout_query) {
-  await fetch(`${API}/answerPreCheckoutQuery`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      pre_checkout_query_id: update.pre_checkout_query.id,
-      ok: true
-    })
-  });
 
-  return res.status(200).send("OK");
-}
+    // ===== PRE CHECKOUT =====
+    if (update.pre_checkout_query) {
+      await fetch(`${API}/answerPreCheckoutQuery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pre_checkout_query_id: update.pre_checkout_query.id,
+          ok: true
+        })
+      });
 
-
-// ===== SUCCESSFUL PAYMENT =====
-if (update.message?.successful_payment) {
-  const userId = update.message.from.id;
-
-  const amount = parseInt(
-    update.message.successful_payment.total_amount
-  );
-
-  await supabase.rpc("add_balance", {
-    user_id: userId,
-    value: amount
-  });
-
-  return res.status(200).send("OK");
-}
+      return res.status(200).send("OK");
+    }
 
 
-// ===== CALLBACK =====
-if (update.callback_query?.data === "about") {
-  await fetch(`${API}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: update.callback_query.message.chat.id,
-      text:
+    // ===== SUCCESSFUL PAYMENT =====
+    if (update.message?.successful_payment) {
+      const userId = update.message.from.id;
+
+      // 1 звезда = 1 звезда (без деления на 100)
+      const amount = update.message.successful_payment.total_amount;
+
+      await supabase.rpc("add_balance", {
+        user_id: userId,
+        value: amount
+      });
+
+      return res.status(200).send("OK");
+    }
+
+
+    // ===== CALLBACK =====
+    if (update.callback_query?.data === "about") {
+      await fetch(`${API}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: update.callback_query.message.chat.id,
+          text:
 "Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, " +
 "где ты можешь открывать кейсы с Telegram-подарками.\n\n" +
 "• Честная механика выпадения призов\n" +
@@ -114,14 +116,24 @@ if (update.callback_query?.data === "about") {
 "📢 Наш канал в Telegram — @GGgifts_official\n" +
 "📩 Поддержка — @GGgiftsHelp\n" +
 "🤝 Сотрудничество — @GGgiftsHelp"
-    })
-  });
+        })
+      });
 
-  await fetch(`${API}/answerCallbackQuery`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      callback_query_id: update.callback_query.id
-    })
-  });
+      await fetch(`${API}/answerCallbackQuery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          callback_query_id: update.callback_query.id
+        })
+      });
+
+      return res.status(200).send("OK");
+    }
+
+    return res.status(200).send("OK");
+
+  } catch (err) {
+    console.log(err);
+    return res.status(200).send("OK");
+  }
 }
