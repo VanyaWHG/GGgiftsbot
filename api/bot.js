@@ -67,25 +67,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // ====== CALLBACK ======
-    if (update.callback_query?.data === "about") {
-      await fetch(`${API}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: update.callback_query.message.chat.id,
-          text:
-"Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, " +
-        "где ты можешь открывать кейсы с Telegram-подарками.\n\n" +
-        "• Честная механика выпадения призов\n" +
-        "• Моментальное получение предметов в Telegram\n\n" +
-        "📢 Наш канал в Telegram — @GGgifts_official\n" +
-        "📩 Поддержка — @GGgiftsHelp\n" +
-        "🤝 Сотрудничество — @GGgiftsHelp"
-        })
-      });
-
-      // ===== PRE CHECKOUT =====
+  // ===== PRE CHECKOUT =====
 if (update.pre_checkout_query) {
   await fetch(`${API}/answerPreCheckoutQuery`, {
     method: "POST",
@@ -99,16 +81,9 @@ if (update.pre_checkout_query) {
   return res.status(200).send("OK");
 }
 
-      await fetch(`${API}/answerCallbackQuery`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          callback_query_id: update.callback_query.id
-        })
-      });
-    }
 
-  if (update.message?.successful_payment) {
+// ===== SUCCESSFUL PAYMENT =====
+if (update.message?.successful_payment) {
   const userId = update.message.from.id;
 
   const amount = parseInt(
@@ -119,13 +94,34 @@ if (update.pre_checkout_query) {
     user_id: userId,
     value: amount
   });
+
+  return res.status(200).send("OK");
 }
 
 
-    res.status(200).send("OK");
+// ===== CALLBACK =====
+if (update.callback_query?.data === "about") {
+  await fetch(`${API}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: update.callback_query.message.chat.id,
+      text:
+"Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, " +
+"где ты можешь открывать кейсы с Telegram-подарками.\n\n" +
+"• Честная механика выпадения призов\n" +
+"• Моментальное получение предметов в Telegram\n\n" +
+"📢 Наш канал в Telegram — @GGgifts_official\n" +
+"📩 Поддержка — @GGgiftsHelp\n" +
+"🤝 Сотрудничество — @GGgiftsHelp"
+    })
+  });
 
-  } catch (err) {
-    console.log(err);
-    res.status(200).send("OK");
-  }
+  await fetch(`${API}/answerCallbackQuery`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      callback_query_id: update.callback_query.id
+    })
+  });
 }
