@@ -70,15 +70,14 @@ if (action === "get_user") {
   });
 }
 
-  // Изменить баланс
-  if (action === "set_balance") {
-    await supabase
-      .from("users")
-      .update({ balance: amount })
-      .eq("telegram_id", target);
+if (action === "set_balance") {
+  await supabase
+    .from("users")
+    .update({ balance: Number(amount) })
+    .eq("telegram_id", Number(target));
 
-    return res.json({ success: true });
-  }
+  return res.json({ success: true });
+}
 
   // Бан / разбан
   if (action === "toggle_ban") {
