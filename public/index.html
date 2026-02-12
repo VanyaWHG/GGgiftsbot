@@ -182,20 +182,30 @@ async function loadUser() {
 
 async function topUp() {
   const amount = prompt("Введите количество звёзд");
-
-  if(!amount) return;
+  if (!amount) return;
 
   const r = await fetch("/api/pay", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ amount: Number(amount) })
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: Number(amount) })
   });
 
   const data = await r.json();
-  tg.openInvoice(data.invoice);
+
+  tg.openInvoice(data.invoice, (status) => {
+
+    if (status === "paid") {
+
+      // ждём 1.5 секунды чтобы бот успел обновить баланс
+      setTimeout(() => {
+        loadUser(); // ← перезагружаем баланс
+      }, 1500);
+
+    }
+
+  });
 }
 
-loadUser();
 </script>
 
 </body>
