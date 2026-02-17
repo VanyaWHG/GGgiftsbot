@@ -12,15 +12,13 @@ const TOKEN = process.env.BOT_TOKEN;
 const API = `https://api.telegram.org/bot${TOKEN}`;
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(200).send("OK");
-  }
+  if (req.method !== "POST") return res.status(200).send("OK");
 
   const update = req.body;
 
   try {
 
-    // ===== /start =====
+    // ====== /start ======
     if (update.message?.text?.startsWith("/start")) {
       const user = update.message.from;
       const chatId = update.message.chat.id;
@@ -34,12 +32,38 @@ export default async function handler(req, res) {
           banned: false
         }, { onConflict: "telegram_id" });
 
-      await fetch(`${API}/sendMessage`, {
+      await fetch(`${API}/sendPhoto`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: chatId,
-          text: "Добро пожаловать 🚀"
+          photo: "https://gggiftsbot.vercel.app/gggifts.jpg",
+          caption:
+`🎁 *Открывай кейсы с Telegram-подарками*
+🚀 *Апгрейдь призы до более ценных*
+
+✅ Испытай удачу прямо сейчас!`,
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [{
+                text: "🚀 Испытать удачу",
+                web_app: { url: "https://gggiftsbot.vercel.app" }
+              }],
+              [{
+                text: "🔥 Telegram канал",
+                url: "https://t.me/GGgifts_official"
+              }],
+              [{
+                text: "ℹ️ О нас",
+                callback_data: "about"
+              }],
+              [{
+                text: "🤝 Поддержка / Сотрудничество",
+                url: "https://t.me/GGgiftsHelp"
+              }]
+            ]
+          }
         })
       });
 
@@ -68,6 +92,36 @@ export default async function handler(req, res) {
       await supabase.rpc("add_balance", {
         user_id: userId,
         value: amount
+      });
+
+      return res.status(200).send("OK");
+    }
+
+    // ===== CALLBACK =====
+    if (update.callback_query?.data === "about") {
+      await fetch(`${API}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: update.callback_query.message.chat.id,
+          text:
+"Это официальный бот сервиса GGgifts — интерактивного Telegram-приложения, где ты можешь открывать кейсы с Telegram-подарками."
+
+"• Честная механика выпадения призов"
+"• Моментальное получение предметов в Telegram"
+
+"📢 Наш канал в Telegram — @GGgifts_official"
+"📩 Поддержка — @GGgiftsHelp"
+"🤝Сотрудничество — @GGgiftsHelp"      
+        })
+      });
+
+      await fetch(`${API}/answerCallbackQuery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          callback_query_id: update.callback_query.id
+        })
       });
 
       return res.status(200).send("OK");
