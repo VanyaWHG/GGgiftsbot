@@ -24,11 +24,12 @@ export default async function handler(req, res) {
   const chatId = update.message.chat.id;
 
   // 1️⃣ Проверяем есть ли пользователь
-  const { data: existingUser } = await supabase
-    .from("users")
-    .select("*")
-    .eq("telegram_id", user.id)
-    .single();
+  const { data: existingUser, error } = await supabase
+  .from("users")
+  .select("*")
+  .eq("telegram_id", user.id)
+  .maybeSingle();
+
 
   if (!existingUser) {
     // 2️⃣ Если нет — создаём
