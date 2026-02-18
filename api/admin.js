@@ -83,7 +83,7 @@ if (action === "set_balance") {
   if (action === "toggle_ban") {
     await supabase
       .from("users")
-      .update({ banned: amount })
+      .update({ is_banned: amount })
       .eq("telegram_id", target);
 
     return res.json({ success: true });
