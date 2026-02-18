@@ -18,57 +18,76 @@ export default async function handler(req, res) {
 
   try {
 
-    // ====== /start ======
-    if (update.message?.text?.startsWith("/start")) {
-      const user = update.message.from;
-      const chatId = update.message.chat.id;
+    //start
+   if (update.message?.text?.startsWith("/start")) {
+  const user = update.message.from;
+  const chatId = update.message.chat.id;
 
+  // 1️⃣ Проверяем есть ли пользователь
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("*")
+    .eq("telegram_id", user.id)
+    .single();
+
+  if (!existingUser) {
+    // 2️⃣ Если нет — создаём
+    await supabase.from("users").insert({
+      telegram_id: user.id,
+      username: user.username || null,
+      balance: 0,
+      banned: false,
+      is_admin: user.id === 7461986138
+    });
+  } else {
+    // 3️⃣ Если есть — обновляем username (если изменился)
+    if (existingUser.username !== user.username) {
       await supabase
         .from("users")
-        .upsert({
-          telegram_id: user.id,
-          username: user.username || null,
-          is_admin: user.id === 7461986138,
-          banned: false
-        }, { onConflict: "telegram_id" });
+        .update({ username: user.username || null })
+        .eq("telegram_id", user.id);
+    }
+  }
 
-      await fetch(`${API}/sendPhoto`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          photo: "https://gggiftsbot.vercel.app/gggifts.jpg",
-          caption:
+  // 4️⃣ Отправляем красивое сообщение
+  await fetch(`${API}/sendPhoto`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      photo: "https://gggiftsbot.vercel.app/gggifts.jpg",
+      caption:
 `🎁 *Открывай кейсы с Telegram-подарками*
 🚀 *Апгрейдь призы до более ценных*
 
 ✅ Испытай удачу прямо сейчас!`,
-          parse_mode: "Markdown",
-          reply_markup: {
-            inline_keyboard: [
-              [{
-                text: "🚀 Испытать удачу",
-                web_app: { url: "https://gggiftsbot.vercel.app" }
-              }],
-              [{
-                text: "🔥 Telegram канал",
-                url: "https://t.me/GGgifts_official"
-              }],
-              [{
-                text: "ℹ️ О нас",
-                callback_data: "about"
-              }],
-              [{
-                text: "🤝 Поддержка / Сотрудничество",
-                url: "https://t.me/GGgiftsHelp"
-              }]
-            ]
-          }
-        })
-      });
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [{
+            text: "🚀 Испытать удачу",
+            web_app: { url: "https://gggiftsbot.vercel.app" }
+          }],
+          [{
+            text: "🔥 Telegram канал",
+            url: "https://t.me/GGgifts_official"
+          }],
+          [{
+            text: "ℹ️ О нас",
+            callback_data: "about"
+          }],
+          [{
+            text: "🤝 Поддержка / Сотрудничество",
+            url: "https://t.me/GGgiftsHelp"
+          }]
+        ]
+      }
+    })
+  });
 
-      return res.status(200).send("OK");
-    }
+  return res.status(200).send("OK");
+}
+
 
     // ===== PRE CHECKOUT =====
     if (update.pre_checkout_query) {
