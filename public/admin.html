@@ -84,7 +84,7 @@ function showProfile(user, inventory){
       </button>
 
       <button onclick="toggleBan(${user.telegram_id}, ${!user.banned})">
-        ${user.banned ? "Разбанить" : "Забанить"}
+        ${user.is_banned ? "Разбанить" : "Забанить"}
       </button>
 
       <hr>
