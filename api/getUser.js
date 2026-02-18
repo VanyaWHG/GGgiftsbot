@@ -8,11 +8,20 @@ const supabase = createClient(
 export default async function handler(req, res) {
   const { telegram_id } = req.body;
 
-  const { data } = await supabase
+  if (!telegram_id) {
+    return res.status(400).json({ error: "No telegram_id" });
+  }
+
+  const { data, error } = await supabase
     .from("users")
     .select("*")
-    .eq("telegram_id", telegram_id)
+    .eq("telegram_id", Number(telegram_id)) // ВАЖНО
     .single();
+
+  if (error) {
+    console.log("GET USER ERROR:", error);
+    return res.json(null);
+  }
 
   res.json(data);
 }
