@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       telegram_id: user.id,
       username: user.username || null,
       balance: 0,
-      banned: false,
+      is_banned: false,
       is_admin: user.id === 7461986138
     });
   } else {
