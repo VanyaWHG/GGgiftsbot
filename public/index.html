@@ -190,7 +190,8 @@ async function topUp() {
    body: JSON.stringify({
   amount: Number(amount),
   telegram_id: user.id
-  })
+    })
+ });
 
   const data = await r.json();
 
